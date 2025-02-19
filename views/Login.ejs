@@ -1,0 +1,33 @@
+<%-include("Header")%>
+    <div class="row parentbody">
+        
+        <form class="col s12" method="post">
+            <h4>
+                Login
+            </h4>
+           <div class="container">
+            
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="email" type="email" class="validate" name="email">
+                    <label for="email">Email</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="password" type="password" class="validate" name="password">
+                    <label for="password">Password</label>
+                </div>
+            </div>
+            <p style="text-align:center">if you don't have an account <a href="./Register" style="color:white">Register</a></p>
+            <div class="button">
+                <button type="submit">
+                    Login
+                </button>
+            </div>
+            
+           </div>
+        </form>
+    </div>
+<%-include("Footer")%>

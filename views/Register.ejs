@@ -1,0 +1,43 @@
+<%-include("Header")%>
+    <div class="row parentbody">
+       
+        <form class="col s12" method="post">
+            <h4>
+                Sign-Up
+            </h4>
+           <div class="container">
+            <div class="row">
+                <div class="input-field col s6">
+                    <input id="first_name"type="text" class="validate" name="username">
+                    <label for="first_name">First Name</label>
+                </div>
+                <div class="input-field col s6">
+                    <input id="last_name" type="text" class="validate" name="lastname">
+                    <label for="last_name">Last Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="email" type="email" class="validate" name="email">
+                    <label for="email">Email</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="password" type="password" class="validate" name="password">
+                    <label for="password">Password</label>
+                </div>
+                <p style="text-align:center">if you have already account <a href="./Login" style="color:white">Login</a></p>
+            </div>
+            
+            <div class="button">
+                <button tyep="submit">
+                    Sign-Up
+                </button>
+            </div>
+            
+           </div>
+        </form>
+    </div>
+<%-include("Footer")%>
