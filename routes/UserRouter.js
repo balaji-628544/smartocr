@@ -8,17 +8,18 @@ const userRouter = express.Router();
 
 userRouter.get("/Login",getLogin);
 
-userRouter.get("/",async(req,res)=>{
-    res.render("Home",{
-        title:"Home",
-        err:"",
-        success:"",
-        user:req.user,
-    })
-});
+// userRouter.get("/",async(req,res)=>{
+//     res.render("Home",{
+//         title:"Home",
+//         err:"",
+//         success:"",
+//         user:req.user,
+//     })
+// });
+
+userRouter.get("/Home",ensureAuthenticated,getHome);
 
 userRouter.post("/Home",upload.single("image"),UploadImg);
-
 
 userRouter.post("/Login",login);
 
@@ -28,6 +29,6 @@ userRouter.post("/Register",Register);
 
 userRouter.get("/Logout",logout);
 
-userRouter.get("/Home",ensureAuthenticated,getHome);
+
 
 module.exports = userRouter;
