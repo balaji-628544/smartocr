@@ -8,14 +8,17 @@ const OCRImg = require("../models/OCRImg");
 
 userRouter.get("/Login",getLogin);
 
-userRouter.get("/",async(req,res)=>{
-    res.render("Home",{
-        title:"Home",
-        err:"",
-        success:"",
-        user:req.user,
-    })
-});
+// userRouter.get("/",async(req,res)=>{
+//     res.render("Home",{
+//         title:"Home",
+//         err:"",
+//         success:"",
+//         user:req.user,
+//     })
+// });
+
+
+// userRouter.get("/Home",ensureAuthenticated,getHome);
 
 userRouter.post("/Home",UploadImg);
 
@@ -28,5 +31,7 @@ userRouter.post("/Register",Register);
 userRouter.get("/Logout",logout);
 
 userRouter.get("/Home",getHome);
+
+userRouter.get("/",getHome);
 
 module.exports = userRouter;

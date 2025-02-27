@@ -17,40 +17,51 @@ exports.getLogin = async (req,res)=>{
 
 
 exports.login = async (req, res, next) => {
-    console.log(req.body);
+    console.log("Login request body:", req.body);
 
     passport.authenticate("local", (err, user, info) => {
+        console.log("req.user : ",req.user)
+        console.log("user after login : ",user);
         if (err) {
-            console.log(err);
+            console.error("Authentication error:", err);
             return next(err);
         }
 
         if (!user) {
             return res.render("Login", {
                 title: "Login",
-                user: req.user,
-                error: info ? info.message : "Invalid credentials",
+                // user: req.user,
+                error: info ? info.message : "Invalid email or password",
                 success: ""
             });
         }
 
         req.logIn(user, (err) => {
             if (err) {
-                return next(err);
+                console.error("Login error:", err);
+                return res.render("Login", {
+                    title: "Login",
+                    // user: req.user,
+                    error: "Login failed. Please try again.",
+                    success: ""
+                });
             }
 
-            // Save session explicitly to ensure it persists
+            // Ensure session is saved before redirecting
             req.session.save((err) => {
                 if (err) {
+                    console.error("Session save error:", err);
                     return next(err);
                 }
 
-                // Optional: Store user ID in a cookie
+                // Store user ID in a secure cookie
                 res.cookie("userId", user.id, {
                     httpOnly: true,
-                    maxAge: 24 * 60 * 60 * 1000  // 1 day expiration
+                    secure: false, 
+                    maxAge: 24 * 60 * 60 * 1000  
                 });
 
+                console.log("User logged in successfully:", user.id);
                 return res.redirect("/Home");
             });
         });
@@ -116,7 +127,6 @@ exports.getHome = async(req,res)=>{
     }
     res.render("Home",{
         title:"Home",
-        success:"LoggedIn",
         err:"",
         user:req.user,
         message:""
