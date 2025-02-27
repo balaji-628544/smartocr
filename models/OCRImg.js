@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const schema = new mongoose.Schema({
     postBy:{
         type:mongoose.Schema.Types.ObjectId,
-        required:true,
         ref:"User"
     },
     images:[
