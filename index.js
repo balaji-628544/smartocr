@@ -24,12 +24,10 @@ app.use(parser());
 passportconfig(passport);
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 app.use("/",userRouter);
 
 mongoose.connect("mongodb://localhost:27017/smartocr").then(()=>{
     console.log("DataBase is Connected");
 })
 
-app.listen(8115, ()=> console.log("Server started at 4000"));
+app.listen(4000, ()=> console.log("Server started at 4000"));

@@ -4,7 +4,7 @@ const { ensureAuthenticated } = require("../middlewares/auth");
 const {getLogin, login, Register,getHome, getRegister, UploadImg,logout} = require("../controllers/userController");
 const upload = require("../config/multer");
 const userRouter = express.Router();
-
+const OCRImg = require("../models/OCRImg");
 
 userRouter.get("/Login",getLogin);
 
@@ -17,8 +17,7 @@ userRouter.get("/",async(req,res)=>{
     })
 });
 
-userRouter.post("/Home",upload.single("image"),UploadImg);
-
+userRouter.post("/Home",UploadImg);
 
 userRouter.post("/Login",login);
 
@@ -28,6 +27,6 @@ userRouter.post("/Register",Register);
 
 userRouter.get("/Logout",logout);
 
-userRouter.get("/Home",ensureAuthenticated,getHome);
+userRouter.get("/Home",getHome);
 
 module.exports = userRouter;

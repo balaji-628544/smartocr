@@ -1,81 +1,115 @@
+
 <%-include("Header")%>
-
 <style>
-*{
-    border:0;
-}
-.cont{
-    height:200px;
-    width:300px;
-    background-color: rgb(131, 123, 123);
-    margin:30px;
-    border-radius: 20px;
-    padding:10px;
-    align-content: end;
-    box-sizing:content-box;
-}
-input{
-    border-radius:10px;
-    position: relative;
-    left: 20px;
-    margin-top: 10px;
-}
-.gettext{
-    position: relative;
-    top:20px;
-    left:43px;
-    
-    
-}
-img{
-    height:80%;
-    width:80%;
-    margin-left: 10%;
-    border-radius: 20px;;
-}
+    * {
+        border: 0;
+    }
 
-.HomeBody{
-    height:80vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
+    .cont {
+        height: 200px;
+        width: 300px;
+        background-color: rgb(131, 123, 123);
+        margin: 30px;
+        border-radius: 20px;
+        padding: 10px;
+        align-content: end;
+        box-sizing: content-box;
+    }
+
+    input {
+        border-radius: 10px;
+        position: relative;
+        left: 20px;
+        margin-top: 10px;
+    }
+
+    .gettext {
+        position: relative;
+        top: 20px;
+        left: 43px;
+    }
+
+    img {
+        height: 80%;
+        width: 80%;
+        margin-left: 10%;
+        border-radius: 20px;
+    }
+
+    .HomeBody {
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    textarea{
+        border: 2px solid greenyellow;
+        height:200px;
+        width:400px;
+        color:greenyellow;
+        padding:10px;
+    }
 </style>
-<form method="post" enctype="multipart/form-data" action="/Home">
+
 <div class="HomeBody">
     <div class="cont">
-        <img  class="img"/> 
-        <input type="file" name="image" class="file" >
-       
-        <button class="gettext" type="submit">Get text</button>
-   </div>
-   
-</div>
-</form>
+        <img id="preview" class="img" style="display: none;" />
+        <input type="file" name="image" class="file" id="fileInput" />
+        <button class="gettext" type="button" id="uploadButton">Get text</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+    document.getElementById("uploadButton").addEventListener("click", async function () {
+        const fileInput = document.getElementById("fileInput");
+        const file = fileInput.files[0];
 
-const input = document.querySelector(".file");
+        if (!file) {
+            alert("Please select an image first!");
+            return;
+        }
 
-const preview =document.querySelector('.img');
+        // Create a FormData object
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "balajirao"); // Replace with your Cloudinary upload preset
 
+        try {
+            // Upload the image to Cloudinary
+            const response = await axios.post(
+                "https://api.cloudinary.com/v1_1/df0hm55mm/image/upload", // Replace with your Cloudinary cloud name
+                formData
+            );
 
+            console.log("Uploaded Image URL:", response.data);
 
-input.addEventListener('change', function(event) {
-    const file = event.target.files[0]; // Get the uploaded file
-    if (file) {
-        const reader = new FileReader(); // Create a FileReader object
+            // Display the uploaded image preview
+            const preview = document.getElementById("preview");
+            preview.src = response.data.secure_url;
+            preview.style.display = "block";
 
-        reader.onload = function(e) {
-            preview.src = e.target.result; // Set the image src to the file's data
-            preview.style.display = 'block'; // Make the image visible
-        };
-
-        reader.readAsDataURL(file); // Read the file as a data URL
-    } else {
-        preview.style.display = 'none'; // Hide the image if no file is selected
-    }
-});
+            // Send the image URL to your backend for further processing
+            const backendResponse = await axios.post("/Home", {
+                imageUrl: response.data.url,
+                filename:response.data.original_filename,
+                public_id:response.data.public_id
+                
+            });
+            alert("Image uploaded and processed successfully!");
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            alert("Failed to upload image. Please try again.");
+        }
+    });
 </script>
+    <div class="content">
+        <textarea name="textarea" id="">
+            <%= message%>
+        </textarea>
+    </div>
+</div>
 
-<%-include("Footer")%>
+
+
+<%- include("Footer") %>

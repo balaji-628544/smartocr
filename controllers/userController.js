@@ -1,7 +1,9 @@
 
 const User = require("../models/User");
 const passport = require("passport")
-const OCRImg = require("../models/OCRImg")
+const OcrImg = require("../models/OCRImg")
+const asyncHandler = require("express-async-handler");
+const vision = require("@google-cloud/vision");
 exports.getLogin = async (req,res)=>{
 
     
@@ -13,38 +15,6 @@ exports.getLogin = async (req,res)=>{
     });
 };
 
-
-// exports.login = async (req,res,next)=>{
-    
-//     console.log(req.body);
-    
-//     passport.authenticate("local",(err,user,info)=>{
-//         if(err){
-//             console.log(err)
-//             return next(err);
-//         }
-//         console.log(user);
-//         if(!user){
-//             return res.render("Login",{
-//                 title: "login",
-//                 user: req.user,
-//                 error: info.message,
-//                 success:""
-//             });
-//         }
-//         // console.log(req.logIn);
-//         req.logIn(user,(err)=>{
-//             if(err){
-//                 return next(err);
-//             }
-
-            
-           
-//             return res.redirect("/Home");
-
-//         });
-//     })(req,res,next);
-//     }
 
 exports.login = async (req, res, next) => {
     console.log(req.body);
@@ -132,7 +102,7 @@ exports.getHome = async(req,res)=>{
      
     const user = req.cookies.userId;
     console.log(req.session);
-    console.log("User"+req.user);
+
 
     const existUser = await User.findById(user);
     if(existUser){
@@ -141,6 +111,7 @@ exports.getHome = async(req,res)=>{
             success:"LoggedIn",
             err:"",
             user:existUser,
+            message:""
             });
     }
     res.render("Home",{
@@ -148,97 +119,65 @@ exports.getHome = async(req,res)=>{
         success:"LoggedIn",
         err:"",
         user:req.user,
+        message:""
         });
     
     
 };
 
 
-// exports.UploadImg = async(req,res)=>{
-//     if(!req.file || req.files === 0){
-//         return res.render("Home",{
-//             err:"Image is required!!",
-//             success:"",
-//         })
-//     }
-//     const images = {
-//        public_id:req.filename,
-//         url:file.path,
-//         content:""
-//     };
-//     console.log(ocrimg);
-//     const ocrimg = new OCRImg({
-//         postBy:req.body,
-//         images,
-//     });
-//     await ocrimg.save();
-//     res.render("Home",{
-//         title:"Home",
-//         user:req.user,
-//         content:"",
-//         success:"LoggedIn",
-//         err:"",
 
-//     });
-    
-// }
-exports.UploadImg = async (req, res) => {
-    // Check if a file was uploaded
-    console.log(req.file);
-    if (!req.file) {
-        return res.render("Home", {
-            err: "Image is required!!",
-            success: "",
-            user:req.user,
-        });
+
+exports.UploadImg = asyncHandler(async (req, res) => {
+    // Check if the file is uploaded
+    console.log(req.body);
+    if (!req.body) {
+        const user = req.cookies.userId;
+        const existUser = await User.findById(user);
+        console.log(existUser);
+        return res.render("Home",{
+            message:"",
+            err:"",
+            user:existUser,
+        })
     }
-  
-    // Extract file details
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = "C:/Users/balaj/OneDrive/Desktop/nodejs/nodep/smartocr/google.json";
+    const client = new vision.ImageAnnotatorClient();
+   
+    async function detectText() {
+      const [result] = await client.textDetection(req.body.imageUrl); // Change to your image path
+      const detections = result.textAnnotations;
+       return detections[0]?.description || "No text found";
+     
+    }
+    let content = await detectText();
+    content = content.replace(/\n/g,"  ");
+    // Cloudinary stores the URL and public ID in req.file
     const images = {
-        public_id: req.file.filename, // Use req.file.filename
-        url: req.file.path, // Use req.file.path
-        content: "" // You can populate this later
+        public_id: req.body.public_id, // Cloudinary public ID
+        url: req.body.imageUrl, // Cloudinary URL
+        content: content,
     };
 
-    console.log("Uploaded Image:", images);
+    console.log("Uploaded Image Details:", images);
+    
+    const user = req.cookies.userId;
+    const existUser = await User.findById(user);
+    // Save the image details to the database
+    const ocrimg = new OcrImg({
+        postBy: existUser,
+        images: images,
+    });
 
-    try {
-        // Save the image details to the database
-        const ocrimg = new OCRImg({
-            postBy: req.body.userId, // Example: Extract userId from req.body
-            images: images,
-        });
+    await ocrimg.save();
 
-        await ocrimg.save();
 
-        // Render the Home page with success message
-        res.render("Home", {
-            title: "Home",
-            user: req.user,
-            content: "",
-            success: "Image uploaded successfully!",
-            err: "",
-        });
-    } catch (error) {
-        console.error("Error saving image:", error);
-        res.render("Home", {
-            title: "Home",
-            user: req.user,
-            content: "",
-            success: "",
-            err: "Failed to upload image. Please try again.",
-        });
-    }
-};
-
-// exports.loginHome = async(req,res)=>{
-//     res.render("Home",{
-//         title:"Home",
-//         success:"LoggedIn",
-//         err:"",
-//         user:req.user,
-//     });
-// }
+    return res.render("Home",{
+        message:content,
+        err:"",
+        user:existUser,
+    })
+});
 
 exports.getRegister = async (req,res)=>{
     res.render("Register",{

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+</head>
+<body>
+
+    <form id="uploadForm">
+        <input type="file" id="fileInput">
+        <input type="submit" value="Upload">
+    </form>
+
+    <img id="preview" style="display: none; width: 200px; height: auto;" alt="Uploaded Image Preview">
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a file first!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "balajirao"); // Replace with your Cloudinary preset
+
+            try {
+                const response = await axios.post(
+                    "https://api.cloudinary.com/v1_1/df0hm55mm/image/upload",
+                    formData
+                );
+
+                console.log("Uploaded Image URL:", response.data.secure_url);
+                
+                // Show preview of uploaded image
+                const preview = document.getElementById("preview");
+                preview.src = response.data.secure_url;
+                preview.style.display = "block";
+            } catch (error) {
+                console.error("Error uploading image:", error);
+            }
+        });
+    </script>
+
+</body>
+</html>

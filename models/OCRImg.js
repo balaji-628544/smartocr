@@ -23,4 +23,8 @@ const schema = new mongoose.Schema({
     ]
 },{timestamps:true});
 
+
+
 const OcrImg = mongoose.model("OcrImg",schema);
+
+module.exports = OcrImg;
