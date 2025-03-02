@@ -173,6 +173,7 @@ exports.UploadImg = asyncHandler(async (req, res) => {
     
     const user = req.cookies.userId;
     const existUser = await User.findById(user);
+    console.log("content is :",content);
     // Save the image details to the database
     const ocrimg = new OcrImg({
         postBy: existUser,
@@ -182,12 +183,15 @@ exports.UploadImg = asyncHandler(async (req, res) => {
     await ocrimg.save();
 
 
-    return res.render("Home",{
-        message:content,
+    return res.render("response",{
+      
+        message:"hello",
         err:"",
         user:existUser,
     })
 });
+
+
 
 exports.getRegister = async (req,res)=>{
     res.render("Register",{

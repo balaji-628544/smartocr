@@ -34,4 +34,10 @@ userRouter.get("/Home",getHome);
 
 userRouter.get("/",getHome);
 
+userRouter.get("/response",async(req,res)=>{
+    res.render("response",{
+        message:"nothing to print"
+    })
+})
+
 module.exports = userRouter;

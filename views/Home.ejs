@@ -58,7 +58,7 @@
         <input type="file" name="image" class="file" id="fileInput" />
         <button class="gettext" type="button" id="uploadButton">Get text</button>
     </div>
-
+    <%= message%>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     document.getElementById("uploadButton").addEventListener("click", async function () {
@@ -104,10 +104,18 @@
     });
 </script>
     <div class="content">
-        <textarea name="textarea" id="">
-            <%= message%>
+        <textarea name="textarea">
+            <% if(message){%>
+                <%= message%>
+            <%}else{%>
+                no text content
+                <%}%>
+           
+            
         </textarea>
     </div>
+           
+       
 </div>
 
 
